@@ -7,8 +7,6 @@
     - pcs
     - fence-agents
     - drbd-utils
-    - ocfs2-tools
-    - dlm-controld
   tags: install
 
 - name: remove ocfs and dlmd

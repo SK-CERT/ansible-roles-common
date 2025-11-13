@@ -1,6 +1,7 @@
 #PATH="$HOME/bin:$HOME/.local/bin:$PATH"
-export HISTSIZE=2000
-export HISTFILESIZE=2000
+export HISTSIZE=4000
+export HISTFILESIZE=4000
+HISTTIMEFORMAT='%FT%R:%S '
 alias ll='ls -l'
 alias la='ls -lA'
 {% if custom_ps1_hostname | default(False) %}

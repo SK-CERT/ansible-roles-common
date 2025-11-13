@@ -15,7 +15,6 @@
 - name: check if we need to reinstall zabbix-release
   set_fact:
     reinstall_zabbix: "{{ res.stdout | regex_search(':[0-9].[0-9]') != ':'+zabbix_version }}"
-    check_mode: no
 
 - debug: msg="reinstall_zabbix={{ reinstall_zabbix }}"
 

@@ -66,7 +66,7 @@
       append: yes
     with_items: "{{ zabbix_etc_groups }}"
 
-  when: zabbix_etc_groups 
+  when: zabbix_etc_groups is defined
 
 - name: make sure zabbix_agent.d directory is present
   file:
@@ -99,7 +99,7 @@
     mode: 0640
   with_items: "{{ zabbix_templates }}"
   tags: configure
-  when: zabbix_template_definitions[item].sudoers | default(false)
+  when: zabbix_template_definitions[item].sudoers is defined
 
 - name: deploy zabbix cron.d
   copy:
@@ -109,7 +109,7 @@
     mode: 0640
   with_items: "{{ zabbix_templates }}"
   tags: configure
-  when: zabbix_template_definitions[item].crond | default(false)
+  when: zabbix_template_definitions[item].crond is defined
 
 - name: deploy zabbix user parameters
   template:
@@ -120,7 +120,7 @@
     mode: 0640
   with_items: "{{ zabbix_templates }}"
   tags: configure
-  when: zabbix_template_definitions[item].params | default(false)
+  when: zabbix_template_definitions[item].params is defined
   notify: restart zabbix-agent
 
 - name: deploy zabbix scripts
