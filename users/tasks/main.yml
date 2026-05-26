@@ -25,7 +25,7 @@
     createhome: true
     password: "{{ item.password | default('*') }}"
     groups: "{{ item.groups | default(omit) }}"
-  with_items : "{{ users }}"
+  with_items : "{{ normalized_users }}"
   async: 100
   poll: 0
   register: create_user
@@ -41,8 +41,8 @@
 
 - name: add authorized_keys
   authorized_key:
-    user: "{{ item }}"
+    user: "{{ item.name }}"
     state: present
     key: "{{ lookup('file', root_dir + '/files/ssh-keys/' + item.name) }}"
   when: '(item.ssh | default(true))'
-  with_items: "{{ users }}"
+  with_items: "{{ normalized_users }}"
