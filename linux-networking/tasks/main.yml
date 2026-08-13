@@ -9,7 +9,7 @@
   template:
     src: mactab
     dest: /etc/mactab
-  when: networking is defined
+  when: networking is defined and networking
   tags: configure
 
 - name: generate /etc/hosts
