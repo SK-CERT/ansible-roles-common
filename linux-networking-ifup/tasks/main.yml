@@ -1,4 +1,6 @@
 - name: ifup missing interfaces
   shell:
     cmd: "ifup '{{ item }}'"
-  with_items: "{{ networking.keys() | difference(ansible_interfaces) | reverse }}"
+  with_items: "{{ networking.keys() | difference(ansible_interfaces) | sort | reverse }}"
+  loop_control:
+    pause: 10
