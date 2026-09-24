@@ -28,4 +28,4 @@ bareos_full_volume_retention: "180 days"
 bareos_full_max_volumes: 100
 bareos_full_max_volume_bytes: "50G"
 
-
+# bareos_server_heartbeat: 60

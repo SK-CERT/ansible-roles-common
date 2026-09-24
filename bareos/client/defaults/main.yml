@@ -1,2 +1,5 @@
 bareos_client_name: "{{ inventory_hostname }}"
 bareos_client_password: "{{ ( bareos_secret + bareos_client_name  ) | hash('sha1') }}"
+
+# bareos_client_heartbeat: 60
+# bareos_client_max_jobs: 20

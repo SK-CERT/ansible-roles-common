@@ -1,6 +1,6 @@
 - name: install bareos server and dependencies
-  package: 
-    name: 
+  package:
+    name:
       - postgresql-all
       - bareos
     state: present
@@ -9,6 +9,17 @@
     - restart bareos-director
     - restart bareos-filedaemon
   tags: install
+
+- name: configure bareos-dir specific vars
+  when: "bareos_server_heartbeat is defined and bareos_server_heartbeat"
+  vars:
+    __dir_block: |
+      Heartbeat Interval {{ bareos_server_heartbeat }}
+  blockinfile:
+    path: "/etc/bareos/bareos-dir.d/director/bareos-dir.conf"
+    prepend_newline: true
+    insertbefore: "}"
+    block: "{{ __dir_block | indent(2, true) }}"
 
 - name: configure bareos-director
   template:
