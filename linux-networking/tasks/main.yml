@@ -3,7 +3,9 @@
     src: 99_disable_hosts.cfg
     dest: /etc/cloud/cloud.cfg.d/
     owner: root
-  tags: configure
+  tags:
+    - configure
+    - dns
 
 - name: generate /etc/mactab
   template:
@@ -16,12 +18,16 @@
   template:
     src: hosts
     dest: /etc/hosts
-  tags: configure
+  tags:
+    - configure
+    - dns
 
 - name: change hostname
   import_role:
     name: common/linux-hostname
-  tags: configure
+  tags:
+    - configure
+    - dns
 
 - name: disable systemd services
   systemd:
@@ -31,18 +37,25 @@
     masked: yes
   with_items:
     - systemd-resolved
+  tags:
+    - always
+    - dns
 
 - name: remove resolvconf
   package:
     name: resolvconf
     state: absent
-  tags: install
+  tags:
+    - install
+    - dns
 
 - name: generate resolv.conf
   template:
     src: resolv.conf
     dest: /etc/resolv.conf
-  tags: configure
+  tags:
+    - configure
+    - dns
 
 - name: ifupdown configuration
   include_tasks: ifupdown.yml
