@@ -1,0 +1,3 @@
+{% for service in needrestart_services %}
+$nrconf{override_rc}{qr(^{{ service | regex_escape }}$)} = 1;
+{% endfor %}

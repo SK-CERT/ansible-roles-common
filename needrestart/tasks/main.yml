@@ -1,0 +1,14 @@
+---
+
+- name: Ensure needrestart is installed
+  ansible.builtin.apt:
+    name: needrestart
+    state: present
+    update_cache: true
+
+- name: Disable needrestart restart exclusions
+  ansible.builtin.replace:
+    path: /etc/needrestart/needrestart.conf
+    regexp: '^(\s*qr\(\^{{ item | regex_escape }}.*\)\s*=>\s*0,\s*)$'
+    replace: "# Ansible managed\n# \\1"
+  loop: "{{ needrestart_services }}"

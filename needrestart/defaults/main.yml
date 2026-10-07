@@ -1,0 +1,12 @@
+---
+
+# Services that needrestart is normally configured not to restart
+# automatically, but which should be allowed to restart.
+#
+# Example:
+# needrestart_services:
+#   - dbus
+#   - systemd-logind
+#   - unattended-upgrades
+
+needrestart_services: []
