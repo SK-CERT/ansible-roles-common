@@ -1,0 +1,18 @@
+[Unit]
+Description={{ systemd_service_desc }}
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=60
+User={{ systemd_service_user }}
+Group={{ systemd_service_group }}
+WorkingDirectory={{ systemd_service_workdir | default(systemd_service_script | dirname) }}
+ExecStart={{ systemd_service_script }}
+{% if systemd_service_custom_cfg is defined and systemd_service_custom_cfg %}
+{{ systemd_service_custom_cfg }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

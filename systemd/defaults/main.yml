@@ -1,0 +1,11 @@
+---
+
+systemd_service_name: "my-service"
+systemd_service_desc: "my service 3000"
+
+systemd_service_user: "runner"
+systemd_service_group: "{{ systemd_service_user }}"
+
+# systemd_service_script: "/path/to/script"
+# systemd_service_workdir: "/path/to"
+# systemd_service_enabled: true
