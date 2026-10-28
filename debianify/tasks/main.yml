@@ -1,6 +1,6 @@
 - name: Purge snapd
   apt:
-    name: 
+    name:
       - snapd
     state: absent
     purge: yes
@@ -32,3 +32,7 @@
     line: ENABLED=0
   failed_when: False
 
+- name: restart motd-news
+  systemd:
+    name: motd-news
+    state: restarted
