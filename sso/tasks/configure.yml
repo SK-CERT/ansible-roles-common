@@ -21,6 +21,8 @@
     bind_dn: "{{ ldap_root_dn }}"
     bind_pw: "{{ ldap_root_pw }}"
   with_dict: "{{ ldap_tech_users }}"
+  loop_control:
+    label: "{{ item.key }}"
   tags: configure
 
 - name: add ldap users
@@ -40,6 +42,8 @@
     bind_dn: "{{ ldap_root_dn }}"
     bind_pw: "{{ ldap_root_pw }}"
   with_items: "{{ ldap_users }}"
+  loop_control:
+    label: "{{ item.login }}"
   tags: configure
 
 - name: remove ldap users
@@ -50,6 +54,8 @@
     bind_pw: "{{ ldap_root_pw }}"
   with_items:
     "{{ ldap_users_remove }}"
+  loop_control:
+    label: "{{ item }}"
   tags: configure
 
 - name: refresh user names and passwords
@@ -64,6 +70,8 @@
     bind_dn: "{{ ldap_root_dn }}"
     bind_pw: "{{ ldap_root_pw }}"
   with_items: "{{ ldap_users }}"
+  loop_control:
+    label: "{{ item.login }}"
   tags: configure
 
 - name: create groups
@@ -76,6 +84,8 @@
     bind_dn: "{{ ldap_root_dn }}"
     bind_pw: "{{ ldap_root_pw }}"
   with_items: "{{ ldap_groups }}"
+  loop_control:
+    label: "{{ item.name }}"
   tags: configure
 
 - name: configure ldap.conf
@@ -87,6 +97,8 @@
       dst: /etc/ldap/ldap.conf
     - src: default
       dst: /etc/default/slapd
+  loop_control:
+    label: "{{ item.dst }}"
   tags: configure
   notify: restart slapd
 
@@ -116,6 +128,8 @@
       dest: "sites-available/inner-tunnel"
     - name: "policy"
       dest: "policy.d/client-group-access"
+  loop_control:
+    label: "{{ item.name }}"
   tags: configure
   notify: restart freeradius
 

@@ -36,6 +36,8 @@
     - name: "shared"
       question: "shared/organization"
       value: "{{ ldap_org }}"
+  loop_control:
+    label: "{{ item.question }}"
   notify: dpkg reconfigure slapd
   tags: install
 
@@ -66,6 +68,8 @@
       question: "slapd/password2"
       value: "{{ ldap_root_pw }}"
       vtype: password
+  loop_control:
+    label: "{{ item.question }}"
   tags: install
 
 - name: run handlers
@@ -105,4 +109,6 @@
     - "ou=tech,{{ ldap_base_dn }}"
     - "ou=users,{{ ldap_base_dn }}"
     - "ou=groups,{{ ldap_base_dn }}"
+  loop_control:
+    label: "{{ item }}"
   tags: install
