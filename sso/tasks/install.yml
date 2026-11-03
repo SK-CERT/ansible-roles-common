@@ -1,0 +1,114 @@
+---
+
+- name: install dependencies
+  package:
+    name:
+      - debconf
+      - debconf-utils
+  tags: install
+
+- name: prepare debconf
+  debconf:
+    name: slapd
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype | default('string') }}"
+  with_items:
+    - name: "slapd"
+      question: "slapd/no_configuration"
+      value: "false"
+      vtype: "boolean"
+    - name: "slapd"
+      question: "slapd/move_old_database"
+      value: "true"
+      vtype: "boolean"
+    - name: "slapd"
+      question: "slapd/purge_database"
+      value: "true"
+      vtype: "boolean"
+    - name: "slapd"
+      question: "slapd/backend"
+      value: "MDB"
+      vtype: "select"
+    - name: "slapd"
+      question: "slapd/domain"
+      value: "{{ ldap_domain }}"
+    - name: "shared"
+      question: "shared/organization"
+      value: "{{ ldap_org }}"
+  loop_control:
+    label: "{{ item.question }}"
+  notify: dpkg reconfigure slapd
+  tags: install
+
+- name: install packages
+  package:
+    name:
+      - slapd
+      - ldap-utils
+      - ldapvi
+      - python3-ldap
+      - freeradius
+      - freeradius-utils
+      - freeradius-ldap
+  tags: install
+
+- name: reconfigure admin pw
+  debconf:
+    name: slapd
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype | default('string') }}"
+  with_items:
+    - name: "slapd"
+      question: "slapd/password1"
+      value: "{{ ldap_root_pw }}"
+      vtype: password
+    - name: "slapd"
+      question: "slapd/password2"
+      value: "{{ ldap_root_pw }}"
+      vtype: password
+  loop_control:
+    label: "{{ item.question }}"
+  tags: install
+
+- name: run handlers
+  meta: flush_handlers
+
+- name: enable memberof module
+  ldap_entry:
+    dn: 'cn=module,cn=config'
+    objectClass: olcModuleList
+    attributes:
+      cn: module
+      olcModuleLoad: memberof.la
+      olcModulePath: /usr/lib/ldap
+  tags: install
+
+- name: enable slapd tls and logging
+  ldap_attrs:
+    dn: 'cn=config'
+    attributes:
+      olcTLSCertificateFile: "/etc/ldap/certs/server.crt"
+      olcTLSCertificateKeyFile: "/etc/ldap/certs/server.key"
+      olcTLSCACertificateFile: "/etc/ldap/certs/ca.crt"
+      olcTLSCipherSuite: 'SECURE:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2'
+      olcTLSVerifyClient: 'try'
+      #olcLogLevel: 'stats'
+    state: exact
+  tags: install
+
+- name: create technical and user sub-trees
+  ldap_entry:
+    dn: '{{ item }}'
+    objectClass: organizationalUnit
+    state: present
+    bind_dn: "{{ ldap_root_dn }}"
+    bind_pw: "{{ ldap_root_pw }}"
+  with_items:
+    - "ou=tech,{{ ldap_base_dn }}"
+    - "ou=users,{{ ldap_base_dn }}"
+    - "ou=groups,{{ ldap_base_dn }}"
+  loop_control:
+    label: "{{ item }}"
+  tags: install

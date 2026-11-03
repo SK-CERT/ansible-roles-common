@@ -1,1 +1,35 @@
+---
+
 sso_allow_insecure: False
+
+# ldap_server: "sso.local.tld"
+# ldap_domain: "local.tld"
+# ldap_org: "TEST ORG"
+# ldap_base_dn: "dc=local,dc=tld"
+# ldap_root_dn: "cn=admin,{{ ldap_base_dn }}"
+# ldap_root_pw_hash: "{SSHA}HASHOFTHEPASSWORD"
+# ldap_root_pw: "plaintextPassword"
+
+# USERS
+#
+# ldap_users:
+#   - login: 'jdoe'
+#     name: 'John Doe'
+#     password: '{SSHA}PASSWORDHASH'
+
+# USERS TO REMOVE
+#
+# ldap_users_remove: ['ksmith']
+
+# GROUPS
+#
+# ldap_groups:
+#   - name: Admins
+#     description: users with admin privileges
+#     members:
+#       - jdoe
+
+# TECH USERS
+#
+# ldap_tech_users:
+#   chat: "chattechuserpassword"
