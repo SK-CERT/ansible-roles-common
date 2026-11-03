@@ -4,7 +4,7 @@
   ldap_attrs:
     dn: 'olcDatabase={1}mdb,cn=config'
     attributes:
-      olcRootPW: "{% if '{SSHA}' in ldap_root_pw %}{{ ldap_root_pw }}{% else %}{{ ldap_root_pw | to_ssha }}{% endif %}"
+      olcRootPW: "{{ ldap_root_pw_hash }}"
     state: exact
   tags: configure
 
