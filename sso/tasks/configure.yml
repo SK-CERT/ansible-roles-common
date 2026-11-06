@@ -102,15 +102,20 @@
   tags: configure
   notify: restart slapd
 
-#XXX: not required?
-#- name: add users to groups
-#  ldap_attr:
-#    dn: "cn={{ item.name }},ou=groups,{{ ldap_base_dn }}"
-#    name: member
-#    values: "{{ item.members | map('regex_replace', '^(.*)$', 'uid=\\1,ou=users,'+ldap_base_dn) | list }}"
-#    bind_dn: "{{ ldap_root_dn }}"
-#    bind_pw: "{{ ldap_root_pw }}"
-#  with_items: "{{ ldap_groups }}"
+- name: add users to groups
+  community.general.ldap_attrs:
+    dn: "cn={{ item.name }},ou=groups,{{ ldap_base_dn }}"
+    attributes:
+      member: "{{ item.members | map('regex_replace', '^(.*)$', 'uid=\\1,ou=users,'+ldap_base_dn) | list }}"
+    bind_dn: "{{ ldap_root_dn }}"
+    bind_pw: "{{ ldap_root_pw }}"
+  with_items: "{{ ldap_groups }}"
+  loop_control:
+    label: "{{ item }}"
+  tags:
+    - configure
+    - members
+  notify: restart slapd
 
 - name: configure freeradius
   template:
