@@ -1,0 +1,6 @@
+---
+
+tls:
+  certificates:
+    - certFile: "{{ netbox_cert_file | default('/opt/certs/' + netbox_domain + '.crt')  }}"
+      keyFile: "{{ netbox_key_file | default('/opt/certs/' + netbox_domain + '.key') }}"

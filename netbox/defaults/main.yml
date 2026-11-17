@@ -1,0 +1,11 @@
+---
+
+netbox_project_dir: /opt/netbox-docker
+netbox_project_prefix: netbox
+
+netbox_domain: ipam.domain.local
+
+netbox_version: latest
+
+# netbox_cert_file: "/path/to/ipam.crt"
+# netbox_key_file: "/path/to/ipam.key"

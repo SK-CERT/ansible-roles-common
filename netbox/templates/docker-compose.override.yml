@@ -1,29 +1,57 @@
 services:
   redis:
     restart: unless-stopped
+    networks:
+      netbox_redis:
   redis-cache:
     restart: unless-stopped
+    networks:
+      netbox_redis:
   postgres:
     restart: unless-stopped
-  nginx-proxy:
-    image: jwilder/nginx-proxy
+    networks:
+      netbox_db:
+  traefik:
+    image: traefik:v3
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+      - "127.0.0.1:9090:9090"
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /opt/nginx-proxy-ssl/:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/traefik:/etc/traefik
+      - /opt/certs:/opt/certs:ro
+    networks:
+      traefik_net:
+      netbox_db:
   netbox-worker:
     restart: unless-stopped
-  netbox-housekeeping:
-    restart: unless-stopped
+    networks:
+      netbox_db:
+      netbox_redis:
   netbox:
     restart: unless-stopped
+    networks:
+      traefik_net:
+      netbox_db:
+      netbox_redis:
+    labels:
+      traefik.enable: true
+      traefik.http.routers.ipam.tls: true
+      traefik.http.routers.ipam.entrypoints: websecure
+      traefik.http.routers.ipam.rule: "Host(`{{ netbox_domain }}`)"
+      traefik.http.routers.ipam.service: "ipam"
+      traefik.http.services.ipam.loadbalancer.server.port: "8080"
+
+    healthcheck:
+      start_period: 90s
+      retries: 3
     environment:
 {% if netbox_ldap_server_uri | default(False) %}
       REMOTE_AUTH_ENABLED: "true"
       REMOTE_AUTH_BACKEND: "netbox.authentication.LDAPBackend"
+      REMOTE_AUTH_AUTO_CREATE_USER: "true"
       AUTH_LDAP_SERVER_URI: "{{ netbox_ldap_server_uri }}"
       AUTH_LDAP_BIND_DN: "{{ netbox_ldap_bind_dn }}"
       AUTH_LDAP_BIND_PASSWORD: "{{ netbox_ldap_bind_password }}"
@@ -37,5 +65,9 @@ services:
       AUTH_LDAP_IS_SUPERUSER_DN: "cn=AppIpamAdmins,ou=groups,{{ netbox_ldap_base }}"
 {% endif %}
       CHANGELOG_RETENTION: 1825
-      VIRTUAL_HOST: "{{ inventory_hostname }}"
-      VIRTUAL_PORT: 8080
+
+networks:
+  netbox_db:
+  netbox_redis:
+  traefik_net:
+    name: traefik_net

@@ -1,17 +1,41 @@
- - name: pull netbox-docker 
-   git:
-     repo: https://github.com/netbox-community/netbox-docker.git
-     dest: /opt/netbox-docker
-     version: release
+- name: pull netbox-docker
+  git:
+    repo: https://github.com/netbox-community/netbox-docker.git
+    dest: "{{ netbox_project_dir }}"
+    version: release
+    update: false  # update is done by a separate set of operations
 
- - name: generate docker-compose override
-   template:
-     src: docker-compose.override.yml
-     dest: /opt/netbox-docker/docker-compose.override.yml
+- name: generate docker-compose override
+  template:
+    src: docker-compose.override.yml
+    dest: "{{ netbox_project_dir }}/docker-compose.override.yml"
 
-# - name: run docker compose
-#   shell: 
-#     docker compose up -d && sleep 120
-#   args:
-#     chdir: /opt/netbox-docker/
-#
+- name: docker compose env
+  copy:
+    content: |
+      COMPOSE_PROJECT_NAME={{ netbox_project_prefix }}
+      VERSION={{ netbox_version }}
+    dest: "{{ netbox_project_dir }}/.env"
+
+- name: create dirs
+  file:
+    state: directory
+    path: "{{ item }}"
+  loop:
+    - /opt/traefik/dynamic
+
+- name: template traefik files
+  block:
+    - name: traefik dynamic tls.yml
+      template:
+        src: tls.yml.j2
+        dest: "/opt/traefik/dynamic/tls.yml"
+
+    - name: traefik traefik.yml
+      template:
+        src: traefik.yml.j2
+        dest: "/opt/traefik/traefik.yml"
+
+- name: docker compose up
+  community.docker.docker_compose_v2:
+    project_src: "{{ netbox_project_dir }}"
